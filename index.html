@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="APEX-Voice: Can Voice Agents Complete Professional Workflows Through Full-Duplex Interaction?" />
+  <meta property="og:title" content="APEX-Voice" />
+  <meta property="og:description" content="A benchmark of 120 interactive professional workflows for full-duplex voice agents." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>APEX-Voice — Professional Workflows for Full-Duplex Voice Agents</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header" id="top">
+    <div class="nav-wrap shell">
+      <a class="brand" href="#top" aria-label="APEX-Voice home"><span class="brand-mark">A</span><span>APEX-Voice</span></a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#abstract">Abstract</a>
+        <a href="#benchmark">Benchmark</a>
+        <a href="#results">Results</a>
+        <a href="#duplex">Full-duplex</a>
+        <a href="#examples">Design</a>
+        <a href="blog.html">Blog</a>
+        <a href="#bibtex">BibTeX</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero shell">
+      <div class="eyebrow-row">
+        <span class="pill">ICLR 2027 submission</span>
+        <span class="pill subtle">Benchmark · Professional work · Full-duplex speech</span>
+      </div>
+      <h1><span class="mono">APEX-Voice</span></h1>
+      <p class="subtitle">Can Voice Agents Complete Professional Workflows Through Full-Duplex Interaction?</p>
+      <p class="hero-question">Fluent conversation is not the same as dependable work. APEX-Voice tests whether real-time voice agents can turn spoken delegation into correct, verifiable professional outcomes.</p>
+      <p class="authors"><strong>Puneet Mathur</strong> · <strong>Dinesh Manocha</strong><br><span>University of Maryland, College Park</span></p>
+
+      <div class="cta-row">
+        <a class="button primary" href="#abstract">Read overview</a>
+        <a class="button" href="blog.html">Read the blog</a>
+        <span class="button disabled" title="Add your manuscript URL in index.html when available">📄 Paper · coming soon</span>
+        <span class="button disabled" title="Add your code URL in index.html when available">💻 Code · coming soon</span>
+        <span class="button disabled" title="Add your dataset URL in index.html when available">🤗 Dataset · coming soon</span>
+      </div>
+
+      <div class="metric-grid hero-metrics">
+        <article><strong>120</strong><span>professional workflows</span></article>
+        <article><strong>10</strong><span>work archetypes</span></article>
+        <article><strong>5</strong><span>frontier real-time voice agents</span></article>
+        <article><strong>&lt;25%</strong><span>best Pass@1</span></article>
+        <article><strong>10.8%</strong><span>best Reliable@3</span></article>
+      </div>
+
+      <figure class="hero-figure figure-card">
+        <img src="assets/figures/intro2.webp" alt="APEX-Voice overview: spoken delegation, Voice Workbench, and verifiable outcomes" />
+        <figcaption>Professional workflows begin with spoken delegation, unfold inside a stateful Voice Workbench, and terminate in verifiable work products.</figcaption>
+      </figure>
+    </section>
+
+    <section id="abstract" class="section shell narrow">
+      <div class="section-kicker">01 · Abstract</div>
+      <h2>From conversation to completed work</h2>
+      <p class="lead">Full-duplex voice agents can now listen, speak, use tools, and act during spoken interactions, but fluent dialogue does not guarantee correct completion of delegated professional workflows.</p>
+      <p>APEX-Voice is a benchmark of 120 interactive professional workflows spanning ten work archetypes, including form completion, corporate negotiation, coordination, consulting, interviewing, troubleshooting, and advice. Each workflow runs in a stateful <em>Voice Workbench</em> with task-specific knowledge, typed tools, a gold-annotated final work artifact, authorization constraints, and a user simulation policy backed by validated pre-compiled speech realizations.</p>
+      <p>The benchmark evaluates both <strong>Artifact Field Accuracy (AFA)</strong> and strict <strong>Workflow Success (WS)</strong>. Workflow Success requires the correct terminal state, a valid process, completion of required actions, and a fully valid final artifact. Across the evaluated frontier voice agents, none exceeds 25% Pass@1, and the best Reliable@3 is 10.8%. The dominant challenge is not merely floor control: agents frequently fail to propagate mid-speech corrections into persistent state and downstream artifacts.</p>
+    </section>
+
+    <section id="benchmark" class="section section-tint">
+      <div class="shell">
+        <div class="section-kicker">02 · The benchmark</div>
+        <h2>A stateful workbench, not a dialogue-only test</h2>
+        <p class="lead maxcopy">Each task begins with a professional objective and ends in a verifiable work artifact. The agent must discover missing requirements, use knowledge and tools, revise evolving state, and remain within user-granted authority while interacting in real time.</p>
+
+        <div class="feature-grid">
+          <article class="feature-card"><span>🗂️</span><h3>Persistent work artifacts</h3><p>Typed outputs such as forms, tickets, notes, schedules, plans, and reports are maintained as the workflow evolves.</p></article>
+          <article class="feature-card"><span>🔎</span><h3>Knowledge grounding</h3><p>Tasks can require local state, supplied documents, retrieval, or reasoning across multiple sources.</p></article>
+          <article class="feature-card"><span>🛠️</span><h3>Typed tools</h3><p>Agents interact with structured APIs and state-changing environment actions rather than only describing what they would do.</p></article>
+          <article class="feature-card"><span>🛡️</span><h3>Authorization boundaries</h3><p>Approval-gated actions, revocations, and process constraints are part of the executable workflow state.</p></article>
+          <article class="feature-card"><span>🎙️</span><h3>Full-duplex interaction</h3><p>Corrections, interruptions, overlap, cancellations, clarifications, and backchannels can change the task while the agent is speaking.</p></article>
+          <article class="feature-card"><span>✅</span><h3>Deterministic end states</h3><p>Success is scored from final Workbench state and canonical event logs, with semantic judging used only where field equivalence is needed.</p></article>
+        </div>
+
+        <figure class="figure-card wide-figure">
+          <img src="assets/figures/chatgpt_data.webp" alt="APEX-Voice dataset composition across work archetype, autonomy, knowledge burden, tool burden, user behavior, and risk" />
+          <figcaption>Benchmark composition spans work archetype, autonomy, knowledge burden, tool burden, user behavior, and risk.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="results" class="section shell">
+      <div class="section-kicker">03 · Results</div>
+      <h2>Current voice agents can succeed — but not reliably</h2>
+      <p class="lead maxcopy">Occasional success substantially exceeds consistent success. A workflow that works once may still fail on repeated runs, revealing a large reliability gap.</p>
+
+      <div class="result-layout">
+        <div class="table-card">
+          <div class="table-title"><span>Professional-work completion</span><span class="legend-note">all values in % except efficiency</span></div>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Model</th><th>Pass@1 ↑</th><th>Pass@3 ↑</th><th>Reliable@3 ↑</th><th>Tool-use efficiency →1</th></tr></thead>
+              <tbody>
+                <tr><td>Step-Audio3</td><td>2.5</td><td>5.0</td><td>0.8</td><td>0.38</td></tr>
+                <tr><td>Gemini-3.8-Live</td><td>13.6</td><td>28.3</td><td>1.7</td><td>1.09</td></tr>
+                <tr><td>GPT-Live-1</td><td>8.9</td><td>15.8</td><td>2.5</td><td>0.94</td></tr>
+                <tr><td>Grok-Voice-Think-2.0</td><td>23.1</td><td><strong>41.7</strong></td><td>5.0</td><td>1.51</td></tr>
+                <tr class="highlight"><td>GPT-realtime-2.1</td><td><strong>23.6</strong></td><td>36.7</td><td><strong>10.8</strong></td><td><strong>0.98</strong></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-note">The paper also reports a cascaded Whisper-LV3 → GPT-5.6 → Chatterbox-TurboTTS control at 1.2 Pass@1 and 0.0 Reliable@3.</p>
+        </div>
+
+        <aside class="finding-stack">
+          <article class="finding"><span class="num">1</span><div><h3>Reliability is the sharper test</h3><p>Grok-Voice-Think-2.0 reaches 41.7% Pass@3, yet only 5.0% of workflows succeed in all three runs.</p></div></article>
+          <article class="finding"><span class="num">2</span><div><h3>Local correctness ≠ completed work</h3><p>GPT-realtime-2.1 reaches 91.4% artifact field accuracy, while strict Pass@1 remains 23.6%.</p></div></article>
+          <article class="finding"><span class="num">3</span><div><h3>Artifact validity is the bottleneck</h3><p>Among the four workflow gates, final Artifact Validity is lowest for every evaluated voice agent and peaks at 35.3%.</p></div></article>
+        </aside>
+      </div>
+
+      <div class="gate-panel">
+        <div class="gate-copy">
+          <h3>Workflow Success is conjunctive</h3>
+          <p>A run succeeds only when all four gates pass: <strong>Target State</strong>, <strong>Process Validity</strong>, <strong>Action Completion</strong>, and <strong>Artifact Validity</strong>. This makes APEX-Voice intentionally stricter than partial-credit metrics.</p>
+          <div class="formula">WS = TS × PV × AC × AV</div>
+        </div>
+        <div class="gate-grid" aria-label="Best reported gate values">
+          <div><b>99.4%</b><span>Target State<br>Grok-Voice-Think-2.0</span></div>
+          <div><b>91.9%</b><span>Process Validity<br>GPT-Live-1</span></div>
+          <div><b>85.8%</b><span>Action Completion<br>Grok-Voice-Think-2.0</span></div>
+          <div class="warning"><b>35.3%</b><span>Artifact Validity<br>GPT-realtime-2.1</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="duplex" class="section section-dark">
+      <div class="shell">
+        <div class="section-kicker light">04 · Full-duplex failure mode</div>
+        <h2>Agents often stop speaking correctly — then keep the wrong state</h2>
+        <p class="lead maxcopy">For most frontier systems, basic floor control is already strong. The harder problem appears after interruption: revised information must overwrite stale state and propagate into later actions and artifacts.</p>
+
+        <div class="duplex-grid">
+          <article class="duplex-card"><span class="big">99.8–100%</span><h3>Barge-in yield</h3><p>GPT-realtime-2.1, Grok-Voice-Think-2.0, Gemini-3.8-Live, and Step-Audio3 yield on essentially all user barge-ins.</p></article>
+          <article class="duplex-card"><span class="big">20–156 ms</span><h3>Median stop latency</h3><p>The same four systems stop quickly once interrupted, so gross floor-control failure does not explain low workflow success.</p></article>
+          <article class="duplex-card accent"><span class="big">20–37 pts</span><h3>Correction uptake gap</h3><p>Artifact Field Accuracy on fields requiring mid-speech correction trails other fields by roughly 20 to 37 points.</p></article>
+          <article class="duplex-card accent"><span class="big">71–89%</span><h3>Correction-linked AV failures</h3><p>Most final Artifact Validity failures are linked to missed or stale corrections.</p></article>
+        </div>
+
+        <figure class="figure-card dark-figure">
+          <img src="assets/figures/orchestrator.webp" alt="Runtime orchestration with user revocation, agent speech, semantic act observer, authorization guards, and shared timeline" />
+          <figcaption>A shared media timeline makes corrections, revocations, approvals, state transitions, and tool actions part of the same causal interaction trace.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="examples" class="section shell">
+      <div class="section-kicker">05 · Construction</div>
+      <h2>Executable workflows are generated from a shared latent world</h2>
+      <p class="lead maxcopy">APEX-Voice constructs the work product, policy knowledge, tools, user program, and speech realizations from a shared specification so the environment remains internally consistent and scoreable.</p>
+      <figure class="figure-card wide-figure">
+        <img src="assets/figures/workflow_generation.webp" alt="APEX-Voice workflow generation pipeline from specification through latent world, tools, speech generation, and quality control" />
+        <figcaption>The construction pipeline instantiates the latent world and work product, adds knowledge and typed tools, compiles a user program with speech realizations, and applies quality control before packaging an executable workflow.</figcaption>
+      </figure>
+
+      <div class="callout split-callout">
+        <div><h3>Why pre-compiled user speech?</h3><p>User language is generated offline and synthesized into a validated frozen speech bank. At runtime, the simulation policy selects among those realizations based on the evolving interaction. This keeps conversations adaptive while reducing uncontrolled user-side variation across model comparisons.</p></div>
+        <div><h3>Quality control</h3><p>The construction process rejects inconsistent or shortcuttable cases. The paper reports that 16% of candidate workflows were rejected for issues such as semantic inconsistency, missing information, invalid shortcut completions, unauthorized actions, or premature disclosure.</p></div>
+      </div>
+    </section>
+
+    <section class="section section-tint">
+      <div class="shell narrow">
+        <div class="section-kicker">06 · A useful control</div>
+        <h2>The problem is not only “voice”</h2>
+        <p class="lead">Frontier text agents perform substantially better on the same workflow environment, but they do not saturate it either.</p>
+        <div class="comparison-card">
+          <div class="comparison-main"><span>54.3–62.0%</span><small>Pass@1 for frontier text controls</small></div>
+          <div class="versus">vs.</div>
+          <div class="comparison-main"><span>≈23%</span><small>Pass@1 for the strongest voice reference</small></div>
+        </div>
+        <p>Field accuracy is much closer (95–98% for text controls versus roughly 91% for the strongest voice reference), while complete workflow success separates sharply. This suggests that real-time spoken interaction primarily stresses coherent state maintenance and execution over time, on top of an already difficult long-horizon agentic task.</p>
+      </div>
+    </section>
+
+    <section class="section shell narrow">
+      <div class="section-kicker">07 · Takeaway</div>
+      <h2>Professional reliability is a systems problem</h2>
+      <p class="lead">Speech perception, reasoning, tool use, floor control, state revision, and artifact generation must work together. Strong performance on any one component is not enough.</p>
+      <div class="quote-card">“The remaining challenge is therefore not speech perception, tool use, or reasoning in isolation, but their composition.”</div>
+      <p class="center-link"><a class="button primary" href="blog.html">Read the longer, non-paper explanation →</a></p>
+    </section>
+
+    <section id="bibtex" class="section section-dark bib-section">
+      <div class="shell narrow">
+        <div class="section-kicker light">08 · BibTeX</div>
+        <h2>Cite APEX-Voice</h2>
+        <div class="code-box">
+          <button class="copy-button" data-copy-target="bibtex-code">Copy</button>
+          <pre id="bibtex-code"><code>@misc{mathur2026apexvoice,
+  title  = {{APEX-Voice}: Can Voice Agents Complete Professional Workflows
+            Through Full-Duplex Interaction},
+  author = {Mathur, Puneet and Manocha, Dinesh},
+  year   = {2026},
+  note   = {ICLR 2027 submission, University of Maryland, College Park}
+}</code></pre>
+        </div>
+        <p class="fineprint">Update the entry with an arXiv identifier or publication metadata once available.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-grid">
+      <div><strong>APEX-Voice</strong><br><span>University of Maryland, College Park · 2026</span></div>
+      <div class="footer-links"><a href="blog.html">Blog</a><a href="#top">Back to top ↑</a></div>
+    </div>
+  </footer>
+  <script src="js/main.js"></script>
+</body>
+</html>

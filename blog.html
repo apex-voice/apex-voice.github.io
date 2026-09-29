@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="A first-person research story behind APEX-Voice: why I built the benchmark, the design choices I made, the experiments I ran, and what I learned about professional voice agents." />
+  <title>APEX-Voice Blog — What I Learned Building a Benchmark for Professional Voice Agents</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="blog-page" id="top">
+  <header class="site-header">
+    <div class="nav-wrap shell">
+      <a class="brand" href="index.html"><span class="brand-mark">A</span><span>APEX-Voice</span></a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <nav class="nav-links">
+        <a href="index.html">Project page</a>
+        <a href="#why">Why I built it</a>
+        <a href="#design">Design choices</a>
+        <a href="#experiments">Experiments</a>
+        <a href="#learned">What I learned</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <article class="blog-shell">
+      <header class="blog-hero">
+        <div class="eyebrow-row">
+          <span class="pill">Behind the paper</span>
+          <span class="pill subtle">~10 minute read</span>
+        </div>
+        <h1>What I learned building a benchmark for professional voice agents</h1>
+        <p class="blog-dek">
+          I started APEX-Voice with a simple frustration: real-time voice agents can sound remarkably capable,
+          but I could not tell whether they could actually carry a professional task from a spoken request to a
+          correct, verifiable outcome. This is the story of how I tried to measure that gap.
+        </p>
+        <p class="byline">Puneet Mathur · APEX-Voice · ICLR 2027 submission</p>
+      </header>
+
+      <figure class="blog-feature figure-card">
+        <img src="assets/figures/intro2.webp" alt="APEX-Voice overview showing spoken delegation, the Voice Workbench, and verifiable outcomes" />
+      </figure>
+
+      <section id="why" class="blog-section">
+        <h2>I kept coming back to the same question</h2>
+        <p>
+          Over the last year, I spent a lot of time looking at full-duplex voice systems: models that can listen
+          while speaking, handle interruptions, overlap naturally with a user, and call tools during a live
+          conversation. The demos are impressive. In many interactions, the model feels much closer to a person
+          than the turn-based voice assistants we were used to.
+        </p>
+        <p>
+          But I kept feeling that we were evaluating the easiest part of the problem. We had good ways to ask
+          whether a system could yield when interrupted, respond quickly, or produce a sensible answer. Those
+          properties matter, but they do not tell me whether I would trust the system with actual work.
+        </p>
+        <p>
+          The example I kept using was deliberately mundane: suppose I ask a voice agent to prepare a leave
+          request. It checks my available dates, starts filling the form, and while it is talking I say,
+          “Actually, change the dates — and don’t submit yet.” A few seconds later I approve the final version.
+          If the agent sounds fluent throughout but leaves the old dates in the form, or submits before approval,
+          I do not consider that task successful.
+        </p>
+        <p>
+          That became the core question behind APEX-Voice:
+          <strong>can a full-duplex voice agent translate conversational competence into dependable professional work?</strong>
+        </p>
+      </section>
+
+      <aside class="blog-pullquote">
+        I did not want to benchmark whether the agent said the right thing. I wanted to benchmark whether the work itself ended up right.
+      </aside>
+
+      <section id="design" class="blog-section">
+        <h2>My first design choice: evaluate workflows, not isolated turns</h2>
+        <p>
+          Once I framed the problem this way, single-turn question answering stopped being a useful abstraction.
+          Professional tasks have persistent state. Information arrives gradually. The user can revise earlier
+          decisions. Tools change the environment. Some actions require approval. And the final output usually
+          exists outside the conversation as a concrete artifact: a form, ticket, memo, schedule, plan, record,
+          or negotiation outcome.
+        </p>
+        <p>
+          So I designed each benchmark item as an executable workflow rather than as a prompt-response pair.
+          Every workflow runs inside what I call the <em>Voice Workbench</em>: an environment that can contain
+          task-specific knowledge, typed tools, a versioned work artifact, authorization constraints, and a
+          user policy that reacts to the agent as the interaction unfolds.
+        </p>
+        <p>
+          I ended up with 120 workflows spanning ten work archetypes. I intentionally varied more than just the
+          task surface: some workflows require almost no external knowledge, others require policy or document
+          lookup; some are nearly prepare-only, others require confirmation or explicit approval; some users are
+          cooperative, while others correct themselves, become ambiguous, or interrupt at inconvenient moments.
+        </p>
+
+        <div class="blog-grid-3">
+          <div><strong>120</strong><span>interactive workflows</span></div>
+          <div><strong>10</strong><span>work archetypes</span></div>
+          <div><strong>10–20</strong><span>graded fields per artifact</span></div>
+        </div>
+
+        <figure class="figure-card blog-inline-figure">
+          <img src="assets/figures/chatgpt_data.webp" alt="APEX-Voice benchmark composition across workflow, autonomy, knowledge, tool, user behavior, and risk axes" />
+          <figcaption>
+            I built the benchmark to vary the workflow itself, the autonomy granted to the agent, the knowledge
+            and tool burden, the user behavior, and the risk profile rather than changing only the wording of a prompt.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="blog-section">
+        <h2>The hardest part was making the benchmark interactive and still reproducible</h2>
+        <p>
+          This was the part I worried about most during the design. If I simply scripted one fixed audio file for
+          every task, the benchmark would be reproducible, but it would not really test an interactive voice agent.
+          The user would never respond to what the agent actually did.
+        </p>
+        <p>
+          At the other extreme, I could put another language model on the user side and let it improvise freely.
+          That would feel realistic, but now two evaluations of the same agent might expose it to materially
+          different users. Worse, two different agents might be tested on different dialogue trajectories, making
+          comparisons much harder to interpret.
+        </p>
+        <p>
+          I settled on a middle ground. I generate and validate the user-side speech realizations offline, but a
+          runtime policy decides which realization to play based on the evolving workflow state. In other words,
+          the interaction can branch, but the speech itself comes from a controlled bank.
+        </p>
+        <p>
+          That design was important to me because I wanted repeated runs to mean something. When I later measured
+          Pass@3 and Reliable@3, I wanted differences to come from the agent’s behavior rather than from an
+          unconstrained simulator inventing a new task on every run.
+        </p>
+
+        <figure class="figure-card blog-inline-figure">
+          <img src="assets/figures/workflow_generation.webp" alt="Workflow generation pipeline for APEX-Voice" />
+          <figcaption>
+            The workflow construction pipeline I used: start from a task specification and shared latent world,
+            derive the artifact, knowledge and tools, generate the user program and speech, and then package the
+            pieces into an executable workflow with quality-control metadata.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="blog-section">
+        <h2>I also stopped treating the transcript as the ground truth</h2>
+        <p>
+          Another choice that changed how I thought about evaluation was to record the whole execution as a causal
+          timeline. The conversation transcript is only one view of what happened. For these tasks I also need to
+          know when the user changed a value, when a tool was called, which artifact version existed at that point,
+          whether approval had been granted, and whether the agent acted on stale state.
+        </p>
+        <p>
+          This led to the semantic-act observer and synchronized event stream in the workbench. A correction such
+          as “change the dates” is represented as a state-changing event, not merely a sentence in a transcript.
+          The environment can then check whether the old value was superseded, whether dependent state changed,
+          and whether a later action used the authorized version.
+        </p>
+
+        <figure class="figure-card blog-inline-figure">
+          <img src="assets/figures/orchestrator.webp" alt="APEX-Voice orchestrator showing user corrections, semantic events, authorization, and workflow state" />
+          <figcaption>
+            A simplified example of the orchestration. The user changes the request while the agent is speaking;
+            the workbench records the revocation, blocks premature commitment, and waits for explicit approval.
+          </figcaption>
+        </figure>
+      </section>
+
+      <section id="experiments" class="blog-section">
+        <h2>Then I ran the agents — and the first result was worse than I expected</h2>
+        <p>
+          I evaluated five frontier real-time voice agents on the same workflow suite. My initial expectation was
+          that the strongest systems would still fail in difficult cases, but that end-to-end success would track
+          their apparent conversational quality reasonably closely.
+        </p>
+        <p>
+          It did not. None of the five systems exceeded 25% Pass@1. The strongest Pass@1 result was 23.6%, and the
+          strongest Reliable@3 — succeeding on the same workflow in all three independent runs — was only 10.8%.
+        </p>
+
+        <div class="blog-table table-card">
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Model</th><th>Pass@1</th><th>Pass@3</th><th>Reliable@3</th></tr></thead>
+              <tbody>
+                <tr><td>GPT-realtime-2.1</td><td>23.6</td><td>36.7</td><td>10.8</td></tr>
+                <tr><td>Grok-Voice-Think-2.0</td><td>23.1</td><td>41.7</td><td>5.0</td></tr>
+                <tr><td>Gemini-3.8-Live</td><td>13.6</td><td>28.3</td><td>1.7</td></tr>
+                <tr><td>GPT-Live-1</td><td>8.9</td><td>15.8</td><td>2.5</td></tr>
+                <tr><td>Step-Audio3</td><td>2.5</td><td>5.0</td><td>0.8</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p>
+          The gap between Pass@3 and Reliable@3 became one of the most interesting results for me. A model can
+          sometimes find a successful trajectory without being able to reproduce it. Grok-Voice-Think-2.0, for
+          example, succeeds at least once across three runs on 41.7% of workflows, but succeeds in all three runs
+          on only 5.0%.
+        </p>
+        <p>
+          That changed the way I interpreted “capability.” For an assistant doing professional work, occasional
+          success and dependable success are very different things.
+        </p>
+      </section>
+
+      <section class="blog-section">
+        <h2>The number that made me re-check the evaluation</h2>
+        <p>
+          GPT-realtime-2.1 gets 91.4% Artifact Field Accuracy but only 23.6% Pass@1. When I first saw that gap,
+          I went back through the evaluation because it looks counterintuitive: how can a system be right on more
+          than nine out of ten fields and still fail most workflows?
+        </p>
+        <p>
+          The answer is that professional tasks are conjunctive. A nearly correct artifact can still be unusable.
+          One stale date, one missing required field, one unauthorized action, or one uncompleted tool call can
+          invalidate the task.
+        </p>
+        <p>That is why I score workflow success through four gates rather than averaging local correctness:</p>
+
+        <div class="blog-gates">
+          <div><span>TS</span><strong>Target State</strong><p>Did the workflow reach the required terminal state?</p></div>
+          <div><span>PV</span><strong>Process Validity</strong><p>Did the agent avoid forbidden or unauthorized actions?</p></div>
+          <div><span>AC</span><strong>Action Completion</strong><p>Were the required actions and tool calls actually completed?</p></div>
+          <div><span>AV</span><strong>Artifact Validity</strong><p>Is the final artifact and lifecycle state completely correct?</p></div>
+        </div>
+
+        <p>
+          The workflow only counts as successful if all four are satisfied. Across the voice agents, Artifact
+          Validity was the lowest gate and topped out at 35.3%. For me, this was a strong signal that current
+          systems are much better at getting pieces of a workflow right than at keeping the whole workflow coherent.
+        </p>
+      </section>
+
+      <section class="blog-section">
+        <h2>The most useful surprise: interruptions were not the main problem</h2>
+        <p>
+          Going into the experiments, I thought a major failure mode would be basic full-duplex control: the user
+          interrupts and the model keeps speaking, fails to hear the correction, or takes too long to yield.
+        </p>
+        <p>
+          That hypothesis was only partly right. Four of the five frontier systems yielded on 99.8–100% of
+          barge-ins, with median stopping delays between 20 and 156 ms. So for those systems, the mechanics of
+          yielding were already quite good.
+        </p>
+        <p>The failure happened one step later.</p>
+        <p>
+          When the user changed a value mid-speech, field accuracy on those corrected fields was 20–37 percentage
+          points lower than on other fields. And 71–89% of final Artifact Validity failures were linked to
+          corrections.
+        </p>
+        <p>
+          This became one of my favorite takeaways from the paper because it separates two abilities that are easy
+          to conflate: <strong>detecting that the user interrupted</strong> and <strong>updating the internal task
+          state correctly after the interruption</strong>. Current agents can often do the first while still
+          struggling badly with the second.
+        </p>
+      </section>
+
+      <section class="blog-section">
+        <h2>I added text agents because I wanted to know whether the benchmark itself was simply too hard</h2>
+        <p>
+          At that point I had another concern: perhaps these workflows were difficult for any agent, and the poor
+          voice results had little to do with the speech interface. So I ran frontier text agents in the same
+          environment as a control.
+        </p>
+        <p>
+          The text agents were substantially stronger, reaching 54.3–62.0% Pass@1 and roughly 95–98% field
+          accuracy, but they still did not solve the benchmark. I found this result useful because it separates
+          two effects.
+        </p>
+        <p>
+          First, long-horizon professional execution is genuinely hard even without audio. Second, putting that
+          workflow inside a live, full-duplex spoken interaction introduces another layer of fragility — especially
+          when task state changes while the agent is already speaking or acting.
+        </p>
+      </section>
+
+      <section id="learned" class="blog-section">
+        <h2>What I came away believing</h2>
+        <p>
+          Before doing this work, I tended to think of professional voice-agent quality as a stack of capabilities:
+          good speech understanding, low latency, strong reasoning, good tool use, and natural turn-taking. I still
+          think all of those matter, but the experiments made me much more focused on the glue between them.
+        </p>
+        <p>
+          A useful professional agent needs a continuously updated working state that connects what the user said,
+          what the agent believes, what has already been written into the artifact, which tools have executed, and
+          what the user has actually authorized. When any of those representations drift apart, a conversation can
+          remain perfectly fluent while the task quietly becomes wrong.
+        </p>
+        <p>
+          That is why I think the next generation of voice-agent research needs to care much more about
+          <em>state synchronization</em>: not just hearing a correction, but invalidating superseded information;
+          not just calling a tool, but making sure its result is reflected in the work product; not just asking for
+          approval, but binding that approval to the exact action and artifact state the user saw.
+        </p>
+        <p>
+          APEX-Voice is my attempt to make those failures measurable. The benchmark is not meant to argue that
+          current systems are bad at conversation — many of them are strikingly good at it. The point is that
+          sounding competent and completing professional work reliably are still very different milestones.
+        </p>
+      </section>
+
+      <aside class="blog-pullquote">
+        The biggest lesson for me was simple: a voice agent can recover the conversational floor and still lose the task.
+      </aside>
+
+      <section class="blog-section">
+        <h2>Why I am excited about this direction</h2>
+        <p>
+          I like this problem because progress is easy to imagine and hard to fake. If a system really gets better,
+          it should leave behind a better artifact, preserve the right state after corrections, obey authorization
+          boundaries, and reproduce that success across repeated runs. Those are outcomes we can inspect directly.
+        </p>
+        <p>
+          My hope is that APEX-Voice pushes evaluation a little further away from “does this interaction feel good?”
+          and toward “did the system actually complete the delegated work correctly?” I think we need both. Natural
+          interaction is what makes voice agents useful; dependable execution is what will make them trustworthy for
+          real professional workflows.
+        </p>
+      </section>
+
+      <div class="blog-end-card">
+        <h2>Want the benchmark details?</h2>
+        <p>The project page has the formal evaluation setup, benchmark composition, metrics, tables, and figures from the paper.</p>
+        <a class="button primary" href="index.html">Explore the APEX-Voice project page →</a>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-grid">
+      <div><strong>APEX-Voice</strong><br><span>Behind the paper · 2026</span></div>
+      <div class="footer-links"><a href="index.html">Project page</a><a href="#top">Back to top ↑</a></div>
+    </div>
+  </footer>
+  <script src="js/main.js"></script>
+</body>
+</html>
